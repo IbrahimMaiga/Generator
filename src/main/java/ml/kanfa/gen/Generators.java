@@ -10,7 +10,7 @@ import java.util.Objects;
 public class Generators {
 
     /**
-     * suppresses default constructor, no-instance outer class
+     * Suppresses default constructor, no-instance outer class
      * static methods are used to return generator {@link Generator} instances
      */
     private Generators(){}
@@ -27,7 +27,7 @@ public class Generators {
         return new Permutation<>(args);
     }
 
-    private static List<List<Integer>> iterativeIndexGenerate(int n, int p) throws Exception {
+    private static List<List<Integer>> iterativeIndexGenerate(int n, int p) {
         List<List<Integer>> lists = createFirst(n);
         if (p > 0 && p <= n) {
             while (p > 1) {
@@ -50,9 +50,9 @@ public class Generators {
         return lists;
     }
 
-    private static void throwException(int n, int p) throws Exception{
+    private static void throwException(int n, int p){
         String message =   (p > n) ?  "p > n" : ( (p == 0) ? "p = 0" : "p < 0");
-        throw new Exception(message);
+        throw new IllegalArgumentException(message);
     }
 
     private static List<List<Integer>> createFirst(int n) {
@@ -75,7 +75,7 @@ public class Generators {
             super(values);
         }
 
-        protected List<List<Integer>> generateIndex(int p) throws Exception{
+        protected List<List<Integer>> generateIndex(int p){
             List<List<Integer>> ars = iterativeIndexGenerate(this.n, p);
             final List<List<Integer>> arrays = new ArrayList<>();
             Objects.requireNonNull(ars);
@@ -134,7 +134,7 @@ public class Generators {
         }
 
         @Override
-        protected List<List<Integer>> generateIndex(int p) throws Exception {
+        protected List<List<Integer>> generateIndex(int p){
             return iterativeIndexGenerate(this.n, p);
         }
     }

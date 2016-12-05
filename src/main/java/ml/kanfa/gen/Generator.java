@@ -7,13 +7,13 @@ import java.util.List;
  */
 public interface Generator<T> {
     @SuppressWarnings("UnusedDeclaration")
-    List<List<T>> generate(int p) throws Exception;
+    List<List<T>> generate(int p);
 
     @SuppressWarnings("UnusedDeclaration")
-    List<String> generateToWord(int p, char separator) throws Exception;
+    List<String> generateToWord(int p, char separator);
 
     @SuppressWarnings("UnusedDeclaration")
-    default List<String> generateToWord(int p) throws Exception {
+    default List<String> generateToWord(int p){
         return generateToWord(p, ' ');
     }
 }

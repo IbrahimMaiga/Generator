@@ -14,7 +14,6 @@ import java.util.List;
 /**
  * @author Ibrahim Maïga.
  */
-
 @RunWith(BlockJUnit4ClassRunner.class)
 public class GeneratorsTest extends TestCase {
 
@@ -129,21 +128,21 @@ public class GeneratorsTest extends TestCase {
     }
 
     @Test
-    public void testGreatherValueException() throws Exception {
-        this.exception.expect(Exception.class);
+    public void greatherValueException() throws Exception {
+        this.exception.expect(IllegalArgumentException.class);
         this.exception.expectMessage("p > n");
         this.permutation.generate(10);
     }
 
     @Test
-    public void testNegativeValueException() throws Exception {
-        this.exception.expect(Exception.class);
+    public void negativeValueException() throws Exception {
+        this.exception.expect(IllegalArgumentException.class);
         this.exception.expectMessage("p < 0");
         this.permutation.generate(-10);
     }
 
     @Test
-    public void testZeroAsParamException() throws Exception {
+    public void zeroAsParamException() throws Exception {
         this.exception.expect(Exception.class);
         this.exception.expectMessage("p = 0");
         this.permutation.generate(0);

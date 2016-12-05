@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 /**
  * @author Ibrahim Maïga.
  */
-
 public abstract class AbstractGenerator<T> implements Generator<T> {
 
     private static final String IDENTITY = "";
@@ -27,11 +26,11 @@ public abstract class AbstractGenerator<T> implements Generator<T> {
         this.n = values.length;
     }
 
-    protected abstract List<List<Integer>> generateIndex(int p) throws Exception;
+    protected abstract List<List<Integer>> generateIndex(int p);
 
     @Override
     @SuppressWarnings("UnusedDeclaration")
-    public List<String> generateToWord(int p, char separator) throws Exception{
+    public List<String> generateToWord(int p, char separator){
         final List<String> lWords = new ArrayList<>();
         final List<List<Integer>> lIndex = generateIndex(p);
         lWords.addAll(lIndex.stream().map(integers -> toWord(integers, separator)).collect(Collectors.toList()));
@@ -40,7 +39,7 @@ public abstract class AbstractGenerator<T> implements Generator<T> {
 
     @Override
     @SuppressWarnings("UnusedDeclaration")
-    public List<List<T>> generate(int p) throws Exception{
+    public List<List<T>> generate(int p){
         return this.generate(this.generateIndex(p));
     }
 
