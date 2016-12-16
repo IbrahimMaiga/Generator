@@ -12,6 +12,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * Class GeneratorsTest.
+ * Contains all {@link Generators} tests.
+ *
  * @author Ibrahim Maïga.
  */
 @RunWith(BlockJUnit4ClassRunner.class)
@@ -21,20 +24,6 @@ public class GeneratorsTest extends TestCase {
     private Generator permutation = Generators.newPermutation("A", "B");
     @Rule
     public ExpectedException exception = ExpectedException.none();
-
-    @Test
-    public void generateIndexPermutation() throws Exception {
-        List<List<Integer>> indexList = new ArrayList<>();
-        List<Integer> var1 = new ArrayList<>();
-        var1.add(1);
-        var1.add(2);
-        List<Integer> var2 = new ArrayList<>();
-        var2.add(2);
-        var2.add(1);
-        indexList.add(var1);
-        indexList.add(var2);
-        assertEquals(indexList, ((AbstractGenerator) this.permutation).generateIndex(2));
-    }
 
     @Test
     public void generateToWordPermutation() throws Exception {
@@ -72,25 +61,6 @@ public class GeneratorsTest extends TestCase {
         List<String> var5 = Arrays.asList("C", "A", "B");
         List<String> var6 = Arrays.asList("C", "B", "A");
         return Arrays.asList(var1, var2, var3, var4, var5, var6);
-    }
-
-
-    @Test
-    public void generateIndexCombination() throws Exception {
-        List<List<Integer>> indexList = new ArrayList<>();
-        List<Integer> var1 = new ArrayList<>();
-        var1.add(1);
-        var1.add(2);
-        List<Integer> var2 = new ArrayList<>();
-        var2.add(1);
-        var2.add(3);
-        List<Integer> var3 = new ArrayList<>();
-        var3.add(2);
-        var3.add(3);
-        indexList.add(var1);
-        indexList.add(var2);
-        indexList.add(var3);
-        assertEquals(indexList, ((AbstractGenerator) this.combination).generateIndex(2));
     }
 
     @Test
