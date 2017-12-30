@@ -10,6 +10,8 @@ import java.util.concurrent.RecursiveTask;
 import java.util.stream.Collectors;
 
 /**
+ * Class Generators
+ *
  * @author Ibrahim Maïga.
  */
 public class Generators {
@@ -55,15 +57,14 @@ public class Generators {
         return new Permutation<>(args);
     }
 
-    private static List<List<Integer>> iterativeIndexGenerate(int n, int p) {
+    private static List<List<Integer>> createIndex(int n, int p) {
         List<List<Integer>> lists = createFirst(n);
         if (p > 0 && p <= n) {
             while (p > 1) {
                 List<List<Integer>> arrayLists = new ArrayList<>();
                 for (List<Integer> list : lists) {
                     for (int i = list.get(list.size() - 1) + 1; i <= n; i++) {
-                        ArrayList<Integer> array = new ArrayList<>();
-                        array.addAll(list);
+                        ArrayList<Integer> array = new ArrayList<>(list);
                         array.add(i);
                         arrayLists.add(array);
                     }
@@ -71,7 +72,6 @@ public class Generators {
                 lists = arrayLists;
                 p--;
             }
-
         } else {
             throwIllegalArgumentException(n, p);
         }
@@ -88,6 +88,12 @@ public class Generators {
         throw new IllegalArgumentException(message);
     }
 
+    /**
+     *
+     * @param n elements size
+     * @return a list consisting of numbers less than or equal
+     * to the value <code>n</code>, all generations are based on this
+     */
     private static List<List<Integer>> createFirst(int n) {
         final List<List<Integer>> lists = new ArrayList<>();
         for (int i = 1; i <= n; i++) {
@@ -109,13 +115,12 @@ public class Generators {
         }
 
         protected List<List<Integer>> generateIndex(int p) {
-            List<List<Integer>> ars = iterativeIndexGenerate(this.n, p);
+            List<List<Integer>> ars = createIndex(this.n, p);
             final List<List<Integer>> arrays = new ArrayList<>();
             Objects.requireNonNull(ars);
             for (List<Integer> array : ars) {
                 arrays.addAll(generateIndex(array, p >= 1 ? (p - 1) : 0));
             }
-
             return arrays;
         }
 
@@ -124,9 +129,9 @@ public class Generators {
             if (pos == 0) {
                 arrays.add(initial);
                 return arrays;
-            } else if (pos == 1)
+            } else if (pos == 1) {
                 return this.circularGeneration(initial, pos);
-
+            }
             else {
                 final List<List<Integer>> generatedIndex = generateIndex(initial, pos - 1);
                 for (List<Integer> array : generatedIndex) {
@@ -136,6 +141,11 @@ public class Generators {
             return arrays;
         }
 
+        /**
+         * @param initial initial list
+         * @param pos the positions where the generation begins
+         * @return list of elements
+         */
         private List<List<Integer>> circularGeneration(final List<Integer> initial, int pos) {
             final List<List<Integer>> arrays = new ArrayList<>();
             List<Integer> array = initial;
@@ -168,7 +178,7 @@ public class Generators {
 
         @Override
         protected List<List<Integer>> generateIndex(int p) {
-            return iterativeIndexGenerate(this.n, p);
+            return createIndex(this.n, p);
         }
     }
 
@@ -180,7 +190,7 @@ public class Generators {
 
         private static final String IDENTITY = "";
         private final List<T> tArray;
-        protected int n;
+        int n;
 
         @SafeVarargs
         @SuppressWarnings("varargs")
@@ -190,15 +200,17 @@ public class Generators {
             this.n = values.length;
         }
 
+        /**
+         * @param p generation length
+         * @return list of index
+         */
         protected abstract List<List<Integer>> generateIndex(int p);
 
         @Override
         @SuppressWarnings("UnusedDeclaration")
         public List<String> generateToWord(int p, char separator) {
-            final List<String> lWords = new ArrayList<>();
             final List<List<Integer>> lIndex = generateIndex(p);
-            lWords.addAll(lIndex.stream().map(integers -> toWord(integers, separator)).collect(Collectors.toList()));
-            return lWords;
+            return lIndex.stream().map(integers -> toWord(integers, separator)).collect(Collectors.toList());
         }
 
         @Override
