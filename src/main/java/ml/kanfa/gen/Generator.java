@@ -4,9 +4,9 @@ import java.util.List;
 
 /**
  * Interface Generator
- * Contains the set of methods specific to a generation
+ * Contains the set of abstract methods specific to a generation
  *
- * @author Ibrahim Maïga.
+ * @author Ibrahim Maïga <maiga.ibrm@gmail.com>.
  */
 public interface Generator<T> {
 

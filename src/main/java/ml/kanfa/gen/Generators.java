@@ -8,11 +8,12 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveTask;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Class Generators
  *
- * @author Ibrahim Maïga.
+ * @author Ibrahim Maïga <maiga.ibrm@gmail.com>.
  */
 public class Generators {
 
@@ -25,13 +26,14 @@ public class Generators {
 
     /**
      * Returns new {@link Generator} implementation instance
-     *<p> A method static is used to access the instance,
+     * <p> A method static is used to access the instance,
      * preferred solution to the access via constructor,
      * this approach gives more possibility because one
      * can work on the instance before returning it,
      * and name is also much more explicit.</p>
+     *
      * @param args list of values
-     * @param <T> generics type
+     * @param <T>  generics type
      * @return new {@link Combination} instance
      */
     @SafeVarargs
@@ -42,13 +44,14 @@ public class Generators {
 
     /**
      * Returns new {@link Generator} implementation instance
-     *<p> A method static is used to access the instance,
+     * <p> A method static is used to access the instance,
      * preferred solution to the access via constructor,
      * this approach gives more possibility because one
      * can work on the instance before returning it,
      * and name is also much more explicit.</p>
+     *
      * @param args list of values
-     * @param <T> generics type
+     * @param <T>  generics type
      * @return new {@link Permutation} instance
      */
     @SafeVarargs
@@ -62,13 +65,14 @@ public class Generators {
         if (p > 0 && p <= n) {
             while (p > 1) {
                 List<List<Integer>> arrayLists = new ArrayList<>();
-                for (List<Integer> list : lists) {
-                    for (int i = list.get(list.size() - 1) + 1; i <= n; i++) {
-                        ArrayList<Integer> array = new ArrayList<>(list);
-                        array.add(i);
-                        arrayLists.add(array);
-                    }
-                }
+                lists.forEach(list -> {
+                            for (int i = list.get(list.size() - 1) + 1; i <= n; i++) {
+                                ArrayList<Integer> array = new ArrayList<>(list);
+                                array.add(i);
+                                arrayLists.add(array);
+                            }
+                        }
+                );
                 lists = arrayLists;
                 p--;
             }
@@ -80,6 +84,7 @@ public class Generators {
 
     /**
      * Throws {@link java.lang.IllegalArgumentException}
+     *
      * @param n elements size
      * @param p generation length
      */
@@ -89,6 +94,8 @@ public class Generators {
     }
 
     /**
+     * Returns a list consisting of numbers less than or equal
+     * to the value <code>n</code>, all generations are based on this
      *
      * @param n elements size
      * @return a list consisting of numbers less than or equal
@@ -106,7 +113,8 @@ public class Generators {
 
     /**
      * Inner Class Permutation
-     * @param <T>
+     *
+     * @param <T> generic parameter
      */
     private static class Permutation<T> extends AbstractGenerator<T> {
         @SafeVarargs
@@ -115,59 +123,108 @@ public class Generators {
         }
 
         protected List<List<Integer>> generateIndex(int p) {
-            List<List<Integer>> ars = createIndex(this.n, p);
-            final List<List<Integer>> arrays = new ArrayList<>();
-            Objects.requireNonNull(ars);
-            for (List<Integer> array : ars) {
-                arrays.addAll(generateIndex(array, p >= 1 ? (p - 1) : 0));
-            }
-            return arrays;
+            final List<List<Integer>> indexes = createIndex(this.n, p);
+//            int parallelism = Runtime.getRuntime().availableProcessors();
+//            final ForkJoinPool pool = new ForkJoinPool(parallelism);
+//            final PermutationRecursiveTask task = new PermutationRecursiveTask(indexes, p);
+//            return pool.invoke(task);
+            return collect(indexes.stream().map(array -> generateIndex(array, p >= 1 ? (p - 1) : 0)));
         }
 
+        /**
+         * Returns list of list the all combination corresponding to initial start in pos
+         *
+         * @param initial the initial value
+         * @param pos     the generation start position
+         * @return list of list the all permutation corresponding to initial start in pos
+         */
         private List<List<Integer>> generateIndex(final List<Integer> initial, int pos) {
-            final List<List<Integer>> arrays = new ArrayList<>();
+            Objects.requireNonNull(initial);
             if (pos == 0) {
+                final List<List<Integer>> arrays = new ArrayList<>();
                 arrays.add(initial);
                 return arrays;
             } else if (pos == 1) {
                 return this.circularGeneration(initial, pos);
+            } else {
+                return this.collect(generateIndex(initial, pos - 1), pos);
             }
-            else {
-                final List<List<Integer>> generatedIndex = generateIndex(initial, pos - 1);
-                for (List<Integer> array : generatedIndex) {
-                    arrays.addAll(circularGeneration(array, pos));
-                }
-            }
+        }
+
+        private List<List<Integer>> collect(Stream<List<List<Integer>>> stream) {
+            final List<List<Integer>> arrays = new ArrayList<>();
+            stream.forEach(arrays::addAll);
             return arrays;
+        }
+
+        private List<List<Integer>> collect(List<List<Integer>> integers, int pos) {
+            return this.collect(integers.stream().map(integer -> circularGeneration(integer, pos)));
         }
 
         /**
          * @param initial initial list
-         * @param pos the positions where the generation begins
+         * @param pos     the positions where the generation begins
          * @return list of elements
          */
         private List<List<Integer>> circularGeneration(final List<Integer> initial, int pos) {
+            Objects.requireNonNull(initial);
             final List<List<Integer>> arrays = new ArrayList<>();
             List<Integer> array = initial;
-
             do {
                 arrays.add(array);
                 array = new ArrayList<>(arrays.get(arrays.size() - 1));
-                int first = array.get(pos - 1);
-
-                for (int i = pos - 1; i < array.size() - 1; i++)
-                    array.set(i, array.get(i + 1));
-
-                array.set(array.size() - 1, first);
-
+                this.permute(pos, array);
             } while (!array.equals(initial));
-
             return arrays;
+        }
+
+        private void permute(int pos, List<Integer> array) {
+            int first = array.get(pos - 1);
+            for (int i = pos - 1; i < array.size() - 1; i++) {
+                array.set(i, array.get(i + 1));
+            }
+            array.set(array.size() - 1, first);
+        }
+
+        private class PermutationRecursiveTask extends RecursiveTask<List<List<Integer>>> {
+
+            private final List<List<Integer>> indexes;
+            private int position;
+            private static final int LIMIT = 20;
+
+            PermutationRecursiveTask(List<List<Integer>> indexes, int position) {
+                this.indexes = Objects.requireNonNull(indexes);
+                this.position = position;
+            }
+
+            @Override
+            protected List<List<Integer>> compute() {
+                final List<ForkJoinTask<List<List<Integer>>>> subTasks = new ArrayList<>();
+                final List<List<Integer>> arrays;
+                int size = indexes.size();
+                if (size > LIMIT) {
+                    arrays = new ArrayList<>();
+                    int mod = size % LIMIT;
+                    int rs = size / LIMIT;
+                    for (int i = 0; i < rs; i++) {
+                        final List<List<Integer>> indexList = this.indexes.subList((LIMIT * i), (LIMIT) * (i + 1));
+                        subTasks.add(new PermutationRecursiveTask(indexList, this.position).fork());
+                    }
+                    if (mod != 0) {
+                        subTasks.add(new PermutationRecursiveTask(this.indexes.subList(size - mod, size), this.position).fork());
+                    }
+                    subTasks.forEach(subTask -> arrays.addAll(subTask.join()));
+                } else {
+                    arrays = collect(this.indexes.stream().map(array -> generateIndex(array, this.position >= 1 ? (this.position - 1) : 0)));
+                }
+                return arrays;
+            }
         }
     }
 
     /**
      * Inner Class Combination
+     *
      * @param <T>
      */
     private static class Combination<T> extends AbstractGenerator<T> {
@@ -184,9 +241,10 @@ public class Generators {
 
     /**
      * Inner Class AbstractGenerator
+     *
      * @param <T>
      */
-    static abstract class AbstractGenerator<T> implements Generator<T> {
+    private static abstract class AbstractGenerator<T> implements Generator<T> {
 
         private static final String IDENTITY = "";
         private final List<T> tArray;
@@ -230,6 +288,11 @@ public class Generators {
                     .reduce(IDENTITY, (a, b) -> (a + (!a.equals(IDENTITY) ? s : IDENTITY) + b));
         }
 
+        /**
+         * @param listIndex index of elements to generate
+         * @return a list of element list, each list contains
+         * a set of objects, which are in fact the desired generation.
+         */
         private List<List<T>> generate(final List<List<Integer>> listIndex) {
             Objects.requireNonNull(listIndex);
             int parallelism = Runtime.getRuntime().availableProcessors();
@@ -240,6 +303,7 @@ public class Generators {
 
         /**
          * Inner Class GeneratorRecursiveTask
+         *
          * @param <T>
          */
         private static class GeneratorRecursiveTask<T> extends RecursiveTask<List<List<T>>> {
@@ -249,8 +313,8 @@ public class Generators {
             private static final int LIMIT = 200;
 
             GeneratorRecursiveTask(final List<T> tArray, final List<List<Integer>> lists) {
-                this.tArray = tArray;
-                this.lists = lists;
+                this.tArray = Objects.requireNonNull(tArray);
+                this.lists = Objects.requireNonNull(lists);
             }
 
             @Override
@@ -266,26 +330,25 @@ public class Generators {
                         final List<List<Integer>> l = this.lists.subList((LIMIT * i), (LIMIT) * (i + 1));
                         subTasks.add(new GeneratorRecursiveTask<>(this.tArray, l).fork());
                     }
-                    if (mod != 0)
+                    if (mod != 0) {
                         subTasks.add(new GeneratorRecursiveTask<>(this.tArray, this.lists.subList(size - mod, size)).fork());
+                    }
+                    subTasks.forEach(subTask -> arrays.addAll(subTask.join()));
                 } else {
                     arrays = getAllIndexValues(this.lists);
                 }
-
-                for (ForkJoinTask<List<List<T>>> subTask : subTasks) {
-                    arrays.addAll(subTask.join());
-                }
-
                 return arrays;
             }
 
             private List<List<T>> getAllIndexValues(final List<List<Integer>> lists) {
+                Objects.requireNonNull(lists);
                 return lists.stream()
                         .map(this::getIndexValues)
                         .collect(Collectors.toList());
             }
 
             private List<T> getIndexValues(final List<Integer> integers) {
+                Objects.requireNonNull(integers);
                 return integers.stream()
                         .map(integer -> this.tArray.get(integer - 1))
                         .collect(Collectors.toList());

@@ -10,12 +10,13 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * Class GeneratorsTest.
  * Contains all {@link Generators} tests.
  *
- * @author Ibrahim Maïga.
+ * @author Ibrahim Maïga <maiga.ibrm@gmail.com>.
  */
 @RunWith(BlockJUnit4ClassRunner.class)
 public class GeneratorsTest extends TestCase {
@@ -39,10 +40,10 @@ public class GeneratorsTest extends TestCase {
 
     @Test
     public void generatePermutationWithLengthEqualsOne() {
-        List<String> var1 = Collections.singletonList("A");
-        List<String> var2 = Collections.singletonList("B");
-        List<String> var3 = Collections.singletonList("C");
-        List<List<String>> generateList = Arrays.asList(var1, var2, var3);
+        final List<String> var1 = Collections.singletonList("A");
+        final List<String> var2 = Collections.singletonList("B");
+        final List<String> var3 = Collections.singletonList("C");
+        final List<List<String>> generateList = Arrays.asList(var1, var2, var3);
         assertEquals(generateList, getPermutation(1));
     }
 
@@ -98,9 +99,9 @@ public class GeneratorsTest extends TestCase {
 
     @Test
     public void permutationLength() {
-        Generator<String> permutation = Generators.newPermutation("A", "B", "C", "D", "E", "F", "G", "H");
-        List<List<String>> words = permutation.generate(7);
-        assertEquals(words.size(), this.getPermutationLength(8, 7));
+        Generator<String> permutation = Generators.newPermutation("A", "B", "C", "D", "E", "F");
+        List<List<String>> words = permutation.generate(4);
+        assertEquals(words.size(), this.getPermutationLength(6, 4));
     }
 
     @Test
@@ -115,12 +116,12 @@ public class GeneratorsTest extends TestCase {
     }
 
     private List<List<String>> getLists() {
-        List<String> var1 = Arrays.asList("A", "B", "C");
-        List<String> var2 = Arrays.asList("A", "C", "B");
-        List<String> var3 = Arrays.asList("B", "C", "A");
-        List<String> var4 = Arrays.asList("B", "A", "C");
-        List<String> var5 = Arrays.asList("C", "A", "B");
-        List<String> var6 = Arrays.asList("C", "B", "A");
+        final List<String> var1 = Arrays.asList("A", "B", "C");
+        final List<String> var2 = Arrays.asList("A", "C", "B");
+        final List<String> var3 = Arrays.asList("B", "C", "A");
+        final List<String> var4 = Arrays.asList("B", "A", "C");
+        final List<String> var5 = Arrays.asList("C", "A", "B");
+        final List<String> var6 = Arrays.asList("C", "B", "A");
         return Arrays.asList(var1, var2, var3, var4, var5, var6);
     }
 
@@ -128,15 +129,25 @@ public class GeneratorsTest extends TestCase {
         return factorial(n) / factorial((n - p));
     }
 
+
     private int getCombinationLength(int n, int p) {
         return getPermutationLength(n, p) / factorial(p);
     }
 
+    /**
+     * Returns n factorial
+     * @param n {@code int} method parameter
+     * @return {@code int} n factorial
+     */
     private int factorial(int n) {
-        if (n == 0 || n == 1) return 1;
-        else return n * factorial(n - 1);
+        return IntStream.range(1, n + 1).reduce(1, (a, b) -> a * b);
     }
 
+    /**
+     * Returns reversed {@code String}
+     * @param str String to reverse
+     * @return {@code String} reversed string
+     */
     private String reverse(String str) {
         final char[] chars = str.toCharArray();
         int length = chars.length;
@@ -148,9 +159,9 @@ public class GeneratorsTest extends TestCase {
     }
 
     /**
-     * Other alternative to build reverse function
-     * @param str String to reverse
-     * @return String reversed string
+     * Other way to make reverse method
+     * @param str {@code String} to reverse
+     * @return {@code String} reversed string
      */
     @SuppressWarnings("UnusedDeclaration")
     private String reverseString(String str) {
