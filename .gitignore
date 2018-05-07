@@ -1,2 +1,5 @@
 ### Maven template
 target/
+.idea/
+Generator_MV.iml
+demo/demo.iml
