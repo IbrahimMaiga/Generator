@@ -10,6 +10,7 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 /**
@@ -34,8 +35,7 @@ public class GeneratorsTest extends TestCase {
 
     @Test
     public void generatePermutation() {
-        List<List<String>> generateList = getLists();
-        assertEquals(generateList, getPermutation(3));
+        assertTrue(getPermutation(3).containsAll(getLists()));
     }
 
     @Test
@@ -43,8 +43,8 @@ public class GeneratorsTest extends TestCase {
         final List<String> var1 = Collections.singletonList("A");
         final List<String> var2 = Collections.singletonList("B");
         final List<String> var3 = Collections.singletonList("C");
-        final List<List<String>> generateList = Arrays.asList(var1, var2, var3);
-        assertEquals(generateList, getPermutation(1));
+        final List<List<String>> generatedList = Arrays.asList(var1, var2, var3);
+        assertEquals(generatedList, getPermutation(1));
     }
 
     @Test
@@ -111,8 +111,8 @@ public class GeneratorsTest extends TestCase {
     }
 
     private List<List<String>> getPermutation(int p) {
-        Generator<String> per = Generators.newPermutation("A", "B", "C");
-        return per.generate(p);
+        Generator<String> generator = Generators.newPermutation("A", "B", "C");
+        return generator.generate(p);
     }
 
     private List<List<String>> getLists() {
@@ -149,6 +149,7 @@ public class GeneratorsTest extends TestCase {
      * @return {@code String} reversed string
      */
     private String reverse(String str) {
+        Objects.requireNonNull(str);
         final char[] chars = str.toCharArray();
         int length = chars.length;
         char[] reversedChars = new char[length];
@@ -165,6 +166,7 @@ public class GeneratorsTest extends TestCase {
      */
     @SuppressWarnings("UnusedDeclaration")
     private String reverseString(String str) {
+        Objects.requireNonNull(str);
         return new StringBuilder(str).reverse().toString();
     }
 }
