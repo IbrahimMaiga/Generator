@@ -140,7 +140,7 @@ public class GeneratorsTest extends TestCase {
      * @return {@code int} n factorial
      */
     private int factorial(int n) {
-        return IntStream.range(1, n + 1).reduce(1, (a, b) -> a * b);
+        return IntStream.rangeClosed(1, n).reduce(1, (a, b) -> a * b);
     }
 
     /**
