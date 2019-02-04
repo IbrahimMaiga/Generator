@@ -241,7 +241,7 @@ public class Generators {
                 this.indexes = Objects.requireNonNull(indexes);
                 this.position = position;
                 this.limit = limit;
-//                LOGGER.info(Thread.currentThread() + " " + String.valueOf(indexes.size()));
+                LOGGER.info(Thread.currentThread() + " " + String.valueOf(indexes.size()));
             }
 
             @Override
