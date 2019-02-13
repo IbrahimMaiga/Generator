@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveTask;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -101,6 +102,35 @@ public class Generators {
         return lists;
     }
 
+    @SuppressWarnings("UnusedDeclaration")
+    private static List<List<Integer>> createRecursiveIndex(int n, int p) {
+        if (p == 0) {
+            return new ArrayList<>();
+        } else if (p == 1) {
+            return createFirst(n);
+        } else {
+            return currentGeneration(createRecursiveIndex(n, p - 1), integers -> createItem(integers, n));
+        }
+    }
+
+    private static List<List<Integer>> createItem(List<Integer> integers, int n) {
+        return IntStream.rangeClosed(integers.get(integers.size() - 1) + 1, n)
+                .mapToObj(value -> {
+                    List<Integer> array = new ArrayList<>(integers);
+                    array.add(value);
+                    return array;
+                }).collect(Collectors.toList());
+    }
+
+    private static <I, T extends List<I>> List<T> currentGeneration(List<T> indexes, Function<T, List<T>> mapper) {
+        return indexes.stream()
+                .map(mapper)
+                .reduce(new ArrayList<>(), (lists, lists2) -> {
+                    lists.addAll(lists2);
+                    return lists;
+                });
+    }
+
     /**
      * Throws {@link java.lang.IllegalArgumentException}
      *
@@ -159,13 +189,9 @@ public class Generators {
             }
         }
 
+
         private List<List<Integer>> currentGeneration(List<List<Integer>> indexes, int pos) {
-            return indexes.stream()
-                    .map(integers -> circularGeneration(integers, pos))
-                    .reduce(new ArrayList<>(), (lists, lists2) -> {
-                        lists.addAll(lists2);
-                        return lists;
-                    });
+            return Generators.currentGeneration(indexes, integers -> circularGeneration(integers, pos));
         }
 
         @SuppressWarnings("UnusedDeclaration")
