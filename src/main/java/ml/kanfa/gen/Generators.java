@@ -152,19 +152,20 @@ public class Generators {
         private List<List<Integer>> generateIndex(final List<Integer> initial, int pos) {
             if (pos == 0) {
                 return Arrays.asList(initial);
+            } else if (pos == 1) {
+                return circularGeneration(initial, 1);
             } else {
-                List<List<Integer>> indexes = circularGeneration(initial, 1);
-                int position = pos - 1;
-                while (position-- > 0) {
-                    final List<List<Integer>> arrays = new ArrayList<>();
-                    for (final List<Integer> integers : indexes) {
-                        arrays.addAll(circularGeneration(integers, pos));
-                    }
-                    pos--;
-                    indexes = arrays;
-                }
-                return indexes;
+                return this.currentGeneration(generateIndex(initial, pos - 1), pos--);
             }
+        }
+
+        private List<List<Integer>> currentGeneration(List<List<Integer>> indexes, int pos) {
+            return indexes.stream()
+                    .map(integers -> circularGeneration(integers, pos))
+                    .reduce(new ArrayList<>(), (lists, lists2) -> {
+                        lists.addAll(lists2);
+                        return lists;
+                    });
         }
 
         @SuppressWarnings("UnusedDeclaration")
@@ -241,7 +242,7 @@ public class Generators {
                 this.indexes = Objects.requireNonNull(indexes);
                 this.position = position;
                 this.limit = limit;
-                LOGGER.info(Thread.currentThread() + " " + String.valueOf(indexes.size()));
+                LOGGER.info(Thread.currentThread() + " " + indexes.size());
             }
 
             @Override
